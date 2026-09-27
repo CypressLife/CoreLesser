@@ -6,32 +6,29 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.github.corelesser.tools.Vector2D
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget.VisImageTextButton
-import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTable
 import ktx.app.KtxApplicationAdapter
-import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.async.KtxAsync
-import kotlin.math.abs
 
 // 游戏入口
-class CoreLesser: KtxApplicationAdapter {
+class CoreLesser : KtxApplicationAdapter {
     // 累加时间
     private var times = 0f
     private var step_time = 0f
     var irons: Long = 0
+
     // 获取屏幕长宽
     val window_width: Int
         get() = Gdx.graphics.width
     val window_height: Int
         get() = Gdx.graphics.height
+
     // 获取帧时间
     val delta_time: Float
         get() = Gdx.graphics.deltaTime
@@ -40,38 +37,46 @@ class CoreLesser: KtxApplicationAdapter {
     val batch_2d: SpriteBatch by lazy { SpriteBatch() }
     val control_camera: OrthographicCamera by lazy { OrthographicCamera() }
     val control_viewport: ScreenViewport by lazy { ScreenViewport() }
+
     // 按钮列表
-    val irons_lable : VisImageTextButton by lazy { VisImageTextButton("Irons:$irons", TextureRegionDrawable(Texture("iron.png"))) }
+    val irons_label: VisImageTextButton by lazy {
+        VisImageTextButton(
+            "Irons:$irons",
+            TextureRegionDrawable(Texture("iron.png"))
+        )
+    }
     val control_stage: Stage by lazy {
         Stage(control_viewport).apply {
             isDebugAll = true
             val root_table = VisTable().apply {
                 setFillParent(true)
                 top().left()
-                irons_lable.apply { setSize(512f, 512f) }
-                add(irons_lable)
+                irons_label.apply { setSize(512f, 512f) }
+                add(irons_label)
             }
             addActor(root_table)
         }
     }
-    val building_sprite1 : Sprite by lazy {
+    val building_sprite1: Sprite by lazy {
         Sprite(Texture("Factory.png")).apply {
             setPosition(128f, 128f)
             setCenter(128f - width / 2, 128f - height / 2)
         }
     }
-    val building_sprite2 : Sprite by lazy {
+    val building_sprite2: Sprite by lazy {
         Sprite(Texture("Factory.png")).apply {
             setPosition(512f, 128f)
             setCenter(512f - width / 2, 128f - height / 2)
         }
     }
+
     override fun create() {
         VisUI.load()
         KtxAsync.initiate()
         world_camera.update()
         control_camera.update()
     }
+
     // 逻辑更新
     fun update() {
         step_time += delta_time
@@ -80,6 +85,7 @@ class CoreLesser: KtxApplicationAdapter {
             step_time -= 1f
         }
     }
+
     // 渲染更新
     override fun render() {
         // 固定时间步长 40Hz
@@ -90,7 +96,7 @@ class CoreLesser: KtxApplicationAdapter {
                 update()
             } while (times < 0f)
         }
-        irons_lable.text = "irons:$irons"
+        irons_label.text = "irons:$irons"
         clearScreen(0.2f, 0.2f, 0.2f, 1f)
         // 游戏画面渲染
         world_camera.update()
@@ -108,6 +114,7 @@ class CoreLesser: KtxApplicationAdapter {
         control_stage.act()
         control_stage.draw()
     }
+
     override fun dispose() {
         VisUI.dispose()
         control_stage.dispose()

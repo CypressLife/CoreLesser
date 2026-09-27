@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="-128 -128 256 256">
+    <defs>
+    <g id="out-arrow">
+        <path d="M 0 80 L 0 32" stroke="#D1C017" stroke-width="8"/>
+        <polygon points="
+        0 108 16 80 -16 80" fill="#D1C017"/>
+    </g>
+    <g id="in-arrow">
+        <path d="M 0 -104 L 0 -32" stroke="#E1E1E1" stroke-width="2" stroke-dasharray="4"/>
+        <polygon points="
+        0 -16 8 -48 -8 -48" fill="#E1E1E1"/>
+    </g>
+    <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    </defs>
+    <!--底板-->
+    <polygon points="
+    0 120 104 60
+    104 -60 0 -120
+    -104 -60 -104 60"
+    fill="#393C57"
+    stroke="#53567C"
+    stroke-width="8"/>
+    <!--支架-->
+    <polygon points="
+    0 96 84 48
+    84 -48 0 -96
+    -84 -48 -84 48"
+    fill="none"
+    stroke="#2A2C40"
+    stroke-width="4"/>
+    <!--齿轮-->
+    <circle cx="0" cy="0" r="64"
+    fill="#35374B"
+    stroke="#555982"
+    stroke-width="8"/>
+    <!--向外-->
+    <use href="#out-arrow" transform="rotate(180 0 0)"/>
+    <use href="#out-arrow" transform="rotate(60 0 0)"/>
+    <use href="#out-arrow" transform="rotate(300 0 0)"/>
+    <!--向内-->
+    <use href="#in-arrow" transform="rotate(180 0 0)"/>
+    <use href="#in-arrow" transform="rotate(60 0 0)"/>
+    <use href="#in-arrow" transform="rotate(300 0 0)"/>
+    <!--发光-->
+    <g filter="url(#glow)" fill="#F59E0B">
+        <!--焦点-->
+        <circle cx="0" cy="0" r="12"
+        fill="#626AE1"/>
+    </g>
+</svg>

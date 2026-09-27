@@ -1,0 +1,72 @@
+# Version catalog is a central place for you to declare and version dependencies
+# https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
+# https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
+
+[versions]
+kotlin = "2.3.10"
+kotlinxDatetime = "0.7.1"
+kotlinxSerializationJSON = "1.10.0"
+kotlinxCoroutines = "1.10.2"
+gdx = "1.13.1"
+gdxGltf = "2.3.0"
+gdxControllers = "2.2.3"
+box2DLights = "1.5"
+ktx = "1.13.1-rc1"
+kryonet = "2.22.0-RC1"
+ai = "1.8.2"
+colorful = "0.9.0"
+visUi = "1.5.5"
+
+[libraries]
+kotlinStdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
+kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+gdxControllers = { module = "com.badlogicgames.gdx-controllers:gdx-controllers-core", version.ref = "gdxControllers"}
+kryonet = { module = "com.esotericsoftware:kryonet", version.ref = "kryonet"}
+gdxCore = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
+gdxAi = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "ai"}
+gdxBox2D = { module = "com.badlogicgames.gdx:gdx-box2d", version.ref = "gdx" }
+gdxBullet = { module = "com.badlogicgames.gdx:gdx-bullet", version.ref = "gdx" }
+gdxFreeType = { module = "com.badlogicgames.gdx:gdx-freetype", version.ref = "gdx" }
+gdxGltf = { module = "com.github.mgsx-dev.gdx-gltf:gltf", version.ref = "gdxGltf" }
+gdx2DLights = { module = "com.badlogicgames.box2dlights:box2dlights", version.ref = "box2DLights" }
+gdxLwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "gdx" }
+gdxPlatformDesktop = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "gdx" }
+visUi = { module = "com.kotcrab.vis:vis-ui", version.ref = "visUi" }
+ktxApp = { module = "io.github.libktx:ktx-app", version.ref = "ktx" }
+ktxAi = { module = "io.github.libktx:ktx-ai", version.ref = "ktx" }
+ktxActors = { module = "io.github.libktx:ktx-actors", version.ref = "ktx" }
+ktxAssets = { module = "io.github.libktx:ktx-assets", version.ref = "ktx" }
+ktxAsync = { module = "io.github.libktx:ktx-async", version.ref = "ktx" }
+ktxAssetsAsync = { module = "io.github.libktx:ktx-assets-async", version.ref = "ktx" }
+ktxBox2D = { module = "io.github.libktx:ktx-box2d", version.ref = "ktx" }
+ktxCollections = { module = "io.github.libktx:ktx-collections", version.ref = "ktx" }
+ktxFreeType = { module = "io.github.libktx:ktx-freetype", version.ref = "ktx" }
+ktxFreeTypeAsync = { module = "io.github.libktx:ktx-freetype-async", version.ref = "ktx" }
+ktxGraphics = { module = "io.github.libktx:ktx-graphics", version.ref = "ktx" }
+ktxI18n = { module = "io.github.libktx:ktx-i18n", version.ref = "ktx" }
+ktxInject = { module = "io.github.libktx:ktx-inject", version.ref = "ktx" }
+ktxLog = { module = "io.github.libktx:ktx-log", version.ref = "ktx" }
+ktxMath = { module = "io.github.libktx:ktx-math", version.ref = "ktx" }
+ktxPreferences = { module  = "io.github.libktx:ktx-preferences", version.ref = "ktx" }
+ktxReflect = { module = "io.github.libktx:ktx-reflect", version.ref = "ktx" }
+ktxScene2D = { module = "io.github.libktx:ktx-scene2d", version.ref = "ktx" }
+ktxStyle = { module = "io.github.libktx:ktx-style", version.ref = "ktx" }
+ktxVis = { module = "io.github.libktx:ktx-vis", version.ref = "ktx" }
+colorful = { module = "com.github.tommyettinger:colorful", version.ref = "colorful" }
+
+
+
+# Libraries can be bundled together for easier import
+[bundles]
+kotlinxEcosystem = ["kotlinStdlib", "kotlinGradlePlugin", "kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines", "kryonet"]
+gdxLibs = ["gdxControllers", "gdxCore", "gdxAi", "gdxBox2D", "gdxBullet", "gdxFreeType", "gdxGltf", "gdx2DLights"]
+ktxLibs = ["ktxApp", "ktxAi", "ktxActors", "ktxAssets", "ktxAsync", "ktxAssetsAsync", "ktxBox2D", "ktxCollections", "ktxFreeType", "ktxFreeTypeAsync", "ktxGraphics", "ktxI18n", "ktxInject", "ktxLog", "ktxMath", "ktxPreferences", "ktxReflect", "ktxScene2D", "ktxStyle"]
+visUiLibs = ["visUi", "ktxVis"]
+colorful = ["colorful"]
+
+[plugins]
+kotlinJVM = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

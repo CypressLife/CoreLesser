@@ -1,0 +1,62 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- 行星径向渐变：模拟球体光照 -->
+        <radialGradient id="planetGrad" cx="38%" cy="32%" r="65%">
+            <stop offset="0%" stop-color="#fff8e0"/>
+            <stop offset="55%" stop-color="#f0c75e"/>
+            <stop offset="100%" stop-color="#a5711f"/>
+        </radialGradient>
+
+        <!-- 星环渐变：使用 userSpaceOnUse 保证全局统一 -->
+        <linearGradient id="ringGrad"
+                        gradientUnits="userSpaceOnUse"
+                        x1="60" y1="150" x2="340" y2="150">
+            <stop offset="0%"  stop-color="#9c8a72" stop-opacity="0.25"/>
+            <stop offset="15%" stop-color="#d8c8a8" stop-opacity="0.85"/>
+            <stop offset="50%" stop-color="#f5e6c8" stop-opacity="1"/>
+            <stop offset="85%" stop-color="#d8c8a8" stop-opacity="0.85"/>
+            <stop offset="100%" stop-color="#9c8a72" stop-opacity="0.25"/>
+        </linearGradient>
+
+        <!--
+          完整星环路径：
+          外椭圆 M 60,150 A 140,50 0 1 0 340,150 A 140,50 0 1 0 60,150 Z
+          内椭圆 M 100,150 A 100,35 0 1 0 300,150 A 100,35 0 1 0 100,150 Z
+          使用 evenodd 填充规则形成环带
+        -->
+        <path id="fullRing"
+              fill-rule="evenodd"
+              fill="url(#ringGrad)"
+              d="
+            M 60,150
+            A 140,50 0 1 0 340,150
+            A 140,50 0 1 0 60,150
+            Z
+            M 100,150
+            A 100,35 0 1 0 300,150
+            A 100,35 0 1 0 100,150
+            Z
+          "/>
+
+        <!-- 前后裁剪区域：以水平长轴 y=150 为界 -->
+        <clipPath id="topHalf">
+            <rect x="0" y="0" width="400" height="150"/>
+        </clipPath>
+        <clipPath id="bottomHalf">
+            <rect x="0" y="150" width="400" height="150"/>
+        </clipPath>
+    </defs>
+
+    <!-- 1. 后半环（在行星后面，先画，被行星遮挡） -->
+    <g clip-path="url(#bottomHalf)">
+        <use href="#fullRing"/>
+    </g>
+
+    <!-- 2. 行星本体 -->
+    <circle cx="200" cy="150" r="80" fill="url(#planetGrad)"/>
+
+    <!-- 3. 前半环（在行星前面，后画，遮挡行星） -->
+    <g clip-path="url(#topHalf)">
+        <use href="#fullRing"/>
+    </g>
+</svg>

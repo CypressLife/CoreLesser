@@ -1,6 +1,5 @@
-package com.github.corelesser.tools.mesh
+package com.github.corelesser.core.mesh
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable

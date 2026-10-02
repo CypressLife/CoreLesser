@@ -23,5 +23,5 @@ plugins {
 
 rootProject.name = "CoreLesser-build-1.0"
 include("app")
-include("tools")
+include("core")
 include("desktop")

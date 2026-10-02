@@ -1,4 +1,4 @@
-package com.github.corelesser.tools.mesh
+package com.github.corelesser.core.mesh
 
 import kotlinx.serialization.json.Json
 

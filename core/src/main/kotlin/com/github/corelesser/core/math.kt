@@ -1,4 +1,4 @@
-package com.github.corelesser.tools
+package com.github.corelesser.core
 
 import kotlin.math.PI
 import kotlin.math.atan2

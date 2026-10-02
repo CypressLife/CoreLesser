@@ -1,6 +1,6 @@
-package com.github.corelesser.tools.entity.ables
+package com.github.corelesser.core.entity.ables
 
-import com.github.corelesser.tools.Vector2D
+import com.github.corelesser.core.Vector2D
 
 interface Moveable {
     val acceleration: Float

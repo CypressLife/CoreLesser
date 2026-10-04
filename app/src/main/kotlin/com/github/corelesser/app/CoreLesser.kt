@@ -1,10 +1,13 @@
 package com.github.corelesser.app
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -18,6 +21,7 @@ import com.github.corelesser.core.Vector2D
 import com.github.corelesser.core.entity.Buildings
 import com.github.corelesser.core.entity.Carrier
 import com.github.corelesser.core.entity.EntityFactory
+import com.github.corelesser.core.entity.ables.CarrierMove
 import com.github.corelesser.core.entity.ables.StoreHelper
 import com.github.corelesser.core.entity.ables.Storeable
 import com.github.corelesser.core.entity.manager.EntityManager
@@ -228,6 +232,7 @@ class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
         Radius.create(0f),
         acceleration = 1f,
         deceleration = 2.5f,
+        rotate = Radius.create(PI.toFloat() / 32f),
         speed = 0f,
         speed_max = 10f,
         target = Vector2D.pair(48f, 48f),
@@ -246,8 +251,16 @@ class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
         add_entity(carrier)
     }
     val store_helper = StoreHelper(entity_manager)
+    val carrier_move = CarrierMove()
 
     override fun update() {
+        carrier_move.entity_move(carrier)
+        println("速度：${carrier.speed}，方向：${carrier.rotation}")
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+            val mouse_position = world_camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
+            carrier.target = Vector2D.pair(mouse_position.x, mouse_position.y)
+        }
+        /*
         building2.item_store_list[Iron]?.let {
             if (it == building2.item_capacity)
                 return
@@ -259,7 +272,7 @@ class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
             carrier.item_store_list[Iron] = store_helper.accept_item(building2, Iron, 20L)
             carrier.target (building1.position)
         }
-        carrier.move()
+        carrier.move()*/
     }
 
     override fun render(delta: Float) {
@@ -281,7 +294,7 @@ class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
     }
     override fun show() {
         Gdx.input.inputProcessor = stage
-        carrier.target(building1.position)
+        carrier.target = building1.position
     }
     override fun resize(width: Int, height: Int) {
         world_viewport.update(width, height, true)

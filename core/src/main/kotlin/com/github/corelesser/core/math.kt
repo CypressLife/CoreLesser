@@ -29,6 +29,7 @@ value class Radius private constructor(val value: Float) {
     operator fun times(other: Float) = create(this.value * other)
     operator fun div(other: Float) = create(this.value / other)
     operator fun rem(other: Float) = create(this.value % other)
+    operator fun unaryMinus() = create(-value)
     // 比较
     operator fun compareTo(other: Radius) = this.value.compareTo(other.value)
     // 打印
@@ -78,16 +79,16 @@ value class Vector2D(private val pack: Long) {
     fun dot(other: Vector2D): Float = (this.x * other.x + this.y * other.y)
 
     // 面积
-    fun lengthArea(): Float = (x.pow(2) + y.pow(2))
+    fun lengthArea(): Float = (this.x.pow(2) + this.y.pow(2))
 
     // 模长
     fun length(): Float = sqrt(lengthArea())
 
     // 方向
-    fun direction(direction: Radius): Vector2D = Vector2D(length() * sin(direction), length() * cos(direction))
+    fun direction(): Radius = Radius.create(atan2(this.y, this.x))
 
     // 打印
-    override fun toString(): String = "(x: $x, y: $y)"
+    override fun toString(): String = "(x: ${this.x}, y: ${this.y})"
 }
 
 // 平面索引, 通过一个 Long 存储两个 Int 属性

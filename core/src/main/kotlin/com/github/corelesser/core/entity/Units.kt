@@ -19,6 +19,7 @@ class TestEntity(
     rotation: Radius,
     override val acceleration: Float,
     override val deceleration: Float,
+    override val rotate: Radius,
     override var speed: Float,
     override val speed_max: Float,
     override var target: Vector2D,
@@ -38,6 +39,7 @@ class Carrier(
     rotation: Radius,
     override val acceleration: Float,
     override val deceleration: Float,
+    override val rotate: Radius,
     override var speed: Float,
     override val speed_max: Float,
     override var target: Vector2D,
@@ -47,39 +49,11 @@ class Carrier(
     init {
         speed = 0f
     }
-
     override val item_store_list = mutableMapOf<Item, Long>()
     override val sprite = Sprite(texture)
         get() {
             field.setPosition(position.x - field.width / 2, position.y - field.height / 2)
             field.rotation = rotation.value * 180f / PI.toFloat() - 90f
             return field
-        }
-    val  direction: Vector2D
-        get() = target - position
-    val distance: Float
-        get() = direction.length()
-    val  rotate: Radius
-        get() = Radius.create(atan2(direction.y, direction.x))
-    var arrive = false
-    fun target(target: Vector2D) {
-        arrive = false
-        this.target = target
-        rotation = rotate
-    }
-    fun move() {
-        if (speed >= distance) {
-            arrive = true
-            position = target
-        }
-        if (arrive) {
-            speed -= deceleration
-            speed = maxOf(0f, speed)
-        }
-        else {
-            speed += acceleration
-            speed = minOf(speed, speed_max)
-        }
-        position += Vector2D.mole(speed, rotation)
     }
 }

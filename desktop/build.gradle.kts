@@ -10,6 +10,7 @@ dependencies {
     api(libs.gdxPlatformDesktop) {
         artifact { classifier = "natives-desktop" }
     }
+    api("com.badlogicgames.gdx:gdx-freetype-platform:${libs.versions.gdx.get()}:natives-desktop")
 }
 
 application {

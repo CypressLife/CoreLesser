@@ -1,7 +1,6 @@
 package com.github.corelesser.app
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -11,9 +10,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.github.corelesser.app.assets.FontCreate
+import com.github.corelesser.app.assets.FontCreate.text
+import com.github.corelesser.app.lang.Language
 import com.github.corelesser.core.Radius
 import com.github.corelesser.core.Vector2D
-import com.github.corelesser.core.entity.TestEntity
+import com.github.corelesser.core.entity.Buildings
+import com.github.corelesser.core.entity.Carrier
+import com.github.corelesser.core.entity.EntityFactory
+import com.github.corelesser.core.entity.ables.StoreHelper
+import com.github.corelesser.core.entity.ables.Storeable
+import com.github.corelesser.core.entity.manager.EntityManager
+import com.github.corelesser.core.materials.Iron
+import com.github.corelesser.core.materials.Item
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTable
@@ -23,14 +32,19 @@ import ktx.app.KtxApplicationAdapter
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.async.KtxAsync
-import org.jetbrains.kotlin.gradle.utils.`is`
+import org.jetbrains.kotlin.gradle.internal.util.UnitStats
+import kotlin.collections.set
 import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.pow
 
 // 游戏入口
 class CoreLesser : KtxApplicationAdapter {
     // 累加时间
     private var times = 0f
+
+    // 游戏语言
+    var language = Language.Simple_Chinese
 
     // 当前屏幕
     var screen : CoreLesserScreen? = null
@@ -54,6 +68,7 @@ class CoreLesser : KtxApplicationAdapter {
     // 入口类初始化
     override fun create() {
         VisUI.load()
+        FontCreate.initialized()
         KtxAsync.initiate()
         screen = MainScreen(this)
     }
@@ -87,6 +102,13 @@ class CoreLesser : KtxApplicationAdapter {
 }
 // 带入口类成员参数的屏幕类
 abstract class CoreLesserScreen(private val game: CoreLesser): KtxScreen {
+    val language
+        get() = game.language
+    var screen
+        get() = game.screen
+        set(value) {
+            game.screen = value
+        }
     val batch_2d
         get() = game.batch_2d
     val window_width
@@ -98,15 +120,19 @@ abstract class CoreLesserScreen(private val game: CoreLesser): KtxScreen {
 // 游戏菜单屏幕
 class MainScreen(private val game: CoreLesser): CoreLesserScreen(game) {
     // 屏幕控件
-    val version_info = VisLabel("CoreLesser\nVersion: 0.1\nbuild-1.0")
-    val battle_button = VisTextButton("Battle").apply {
+    val version_info = VisLabel("失核者\nCoreLesser\nVersion: 0.1\nbuild-1.0").text(
+        "失核者\nCoreLesser\nVersion: 0.1\nbuild-1.0", Language.Simple_Chinese, 16
+    )
+    val battle_button = VisTextButton("").apply {
+        text(language.text.battle, language, 24)
         addListener(object: ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                game.screen = GameScreen(game)
+                screen = GameScreen(game)
             }
         })
     }
-    val option_button = VisTextButton("Options").apply {
+    val option_button = VisTextButton(language.text.option).apply {
+        text(language.text.option, language, 24)
         addListener(object: ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 option_window.isVisible = true
@@ -181,72 +207,59 @@ class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
     val stage = Stage(control_viewport)
     // 屏幕布局
 
-    val building1 : TestEntity by lazy {
-        TestEntity(
-            1L,
-            Vector2D.pair(64f, 64f),
-            Radius.create(0f),
-            acceleration = 0f,
-            deceleration = 0f,
-            speed = 0f,
-            speed_max = 0f,
-            target = Vector2D.pair(64f, 64f),
-            texture = Texture("Factory.png"),
-        )}
-    private val building2 : TestEntity by lazy {
-        TestEntity(
-            2L,
-            Vector2D.pair(640f, 64f),
-            Radius.create(0f),
-            acceleration = 0f,
-            deceleration = 0f,
-            speed = 0f,
-            speed_max = 0f,
-            target = Vector2D.pair(640f, 64f),
-            texture = Texture("Factory.png"),
-        )}
-    private val entity : TestEntity by lazy {
-        TestEntity(
-            3L,
-            Vector2D.pair(64f, 64f),
-            Radius.create(-PI.toFloat()/2),
-            acceleration = 4f,
-            deceleration = 1f,
-            speed = 0f,
-            speed_max = 20f,
-            target = Vector2D.pair(640f, 64f),
-            texture = Texture("TestTank.png"),
-        )}
-    private var target_building = "B2"
+    // 测试代码
+    val building1 = Buildings.create_store(
+        0L,
+        Vector2D.pair(48f, 48f),
+        Radius.create(0f),
+        item_capacity = 100L,
+        texture = Texture("Factory.png"),
+    ).apply { item_store_list[Iron] = 100L }
+    val building2 = Buildings.create_store(
+        1L,
+        Vector2D.pair(960f, 480f),
+        Radius.create(0f),
+        item_capacity = 100L,
+        texture = Texture("Factory.png"),
+    )
+    val carrier = Carrier(
+        2L,
+        Vector2D.pair(690f, 360f),
+        Radius.create(0f),
+        acceleration = 1f,
+        deceleration = 2.5f,
+        speed = 0f,
+        speed_max = 10f,
+        target = Vector2D.pair(48f, 48f),
+        item_capacity = 10L,
+        texture = Texture("TestRunner.png")
+    )
+    val direction
+        get() = carrier.target - carrier.position
+    val rotate
+        get() = atan2(direction.y, direction.x)
+    val distance
+        get() = (carrier.target - carrier.position).length()
+    val entity_manager = EntityManager().apply {
+        add_entity(building1)
+        add_entity(building2)
+        add_entity(carrier)
+    }
+    val store_helper = StoreHelper(entity_manager)
 
     override fun update() {
-        val target =
-            if (target_building == "B2") building2.position else building1.position
-        val distance = (target - entity.position).length()
-        if (entity.speed >= distance) {
-            entity.position = entity.target
-            if (target_building == "B2") {
-                target_building = "B1"
-                entity.target = building1.position
-            } else {
-                target_building = "B2"
-                entity.target = building2.position
-            }
+        building2.item_store_list[Iron]?.let {
+            if (it == building2.item_capacity)
+                return
         }
-        if (entity.speed.pow(2) >= 2 * entity.deceleration * distance) {
-            entity.speed -= entity.deceleration
-            if (entity.speed < 0f)
-                entity.speed = 0f
-        } else {
-            entity.speed += entity.acceleration
-            if (entity.speed > entity.speed_max)
-                entity.speed = entity.speed_max
+        if (carrier.arrive && carrier.target == building1.position) {
+            building1.item_store_list[Iron] = store_helper.accept_item(carrier, Iron, 20L)
+            carrier.target (building2.position)
+        } else if (carrier.arrive && carrier.target == building2.position) {
+            carrier.item_store_list[Iron] = store_helper.accept_item(building2, Iron, 20L)
+            carrier.target (building1.position)
         }
-        if (target_building == "B2") {
-            entity.position += Vector2D.pair(entity.speed, 0f)
-        } else {
-            entity.position -= Vector2D.pair(entity.speed, 0f)
-        }
+        carrier.move()
     }
 
     override fun render(delta: Float) {
@@ -259,7 +272,7 @@ class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
         batch_2d.begin()
         building1.sprite.draw(batch_2d)
         building2.sprite.draw(batch_2d)
-        entity.sprite.draw(batch_2d)
+        carrier.sprite.draw(batch_2d)
         batch_2d.end()
         // 游戏 UI 渲染
         control_camera.update()
@@ -268,6 +281,7 @@ class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
     }
     override fun show() {
         Gdx.input.inputProcessor = stage
+        carrier.target(building1.position)
     }
     override fun resize(width: Int, height: Int) {
         world_viewport.update(width, height, true)

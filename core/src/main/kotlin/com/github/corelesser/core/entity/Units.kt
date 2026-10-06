@@ -2,16 +2,22 @@ package com.github.corelesser.core.entity
 
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.math.Vector2
 import com.github.corelesser.core.Radius
 import com.github.corelesser.core.Vector2D
-import com.github.corelesser.core.entity.ables.Moveable
+import com.github.corelesser.core.entity.ables.units.Carrierable
+import com.github.corelesser.core.entity.ables.units.Moveable
 import com.github.corelesser.core.entity.ables.SpriteDrawable
-import com.github.corelesser.core.entity.ables.Storeable
+import com.github.corelesser.core.entity.ables.buildings.P2Pchannel
+import com.github.corelesser.core.entity.ables.buildings.Storeable
 import com.github.corelesser.core.materials.Item
 import kotlin.math.PI
-import kotlin.math.atan2
+
+// 抽象单位实体类
+abstract class UnitEntity(
+    id: Long,
+    position: Vector2D,
+    rotation: Radius,
+): Entity(id, position, rotation)
 
 class TestEntity(
     id: Long,
@@ -33,23 +39,25 @@ class TestEntity(
         }
 }
 
-class Carrier(
+class TestCarrier(
     id: Long,
     position: Vector2D,
     rotation: Radius,
     override val acceleration: Float,
     override val deceleration: Float,
     override val rotate: Radius,
-    override var speed: Float,
     override val speed_max: Float,
     override var target: Vector2D,
     override val item_capacity: Long,
+    override var channel: P2Pchannel?,
     override val texture: Texture
-    ): Entity(id,position,rotation), Moveable, Storeable, SpriteDrawable {
+    ): UnitEntity(id,position,rotation), Moveable, Carrierable, SpriteDrawable {
+    override var speed: Float = 0f
     init {
         speed = 0f
     }
-    override val item_store_list = mutableMapOf<Item, Long>()
+    override var now_item_type: Item? = null
+    override var now_item_value: Long = 0L
     override val sprite = Sprite(texture)
         get() {
             field.setPosition(position.x - field.width / 2, position.y - field.height / 2)

@@ -1,11 +1,11 @@
-package com.github.corelesser.core.entity.ables
+package com.github.corelesser.core.entity.ables.units
 
 import com.github.corelesser.core.Radius
 import com.github.corelesser.core.Vector2D
 import com.github.corelesser.core.entity.Entity
-import kotlin.math.atan2
 import kotlin.math.pow
 
+// 单位实体移动能力接口
 interface Moveable {
     val acceleration: Float
     val deceleration: Float
@@ -15,16 +15,15 @@ interface Moveable {
     var target: Vector2D
 }
 
+// 单位实体移动处理类
 abstract class MoveHelper {
-    // protected open val entities = mutableMapOf<Long, Entity>()
     abstract fun entity_move(entity: Entity)
 }
 
-class CarrierMove: MoveHelper() {
+class UnitEntityMove: MoveHelper() {
     override fun entity_move(entity: Entity) {
-        // 不是可移动直接跳过，同时使得传入的 entity 在后续计算中是 Moveable 的实现
-        if (entity !is Moveable)
-            return
+        // 不是可移动直接跳过，同时使得传入的 entity 在后续使用中是 Moveable 的实现
+        if (entity !is Moveable) return
         val displace = entity.target - entity.position
         val distance = displace.length()
         // 移动距离过小直接吸附，吸附完返回
@@ -47,13 +46,13 @@ class CarrierMove: MoveHelper() {
         val direction = displace.direction()
         val rotate: Radius = direction - entity.rotation
         when {
-            rotate > entity.rotate -> entity.rotation += entity.rotate
+            rotate > +entity.rotate -> entity.rotation += entity.rotate
             rotate < -entity.rotate -> entity.rotation -= entity.rotate
             else -> entity.rotation = direction
         }
         // 移动至朝向位置，需要确保位移距离不超过实际距离
         val step = minOf(entity.speed, distance)
-        entity.position += Vector2D.mole(step, entity.rotation)
+        entity.position += Vector2D.Companion.mole(step, entity.rotation)
         // 到达目标附近后吸附
         if (step >= distance) {
             entity.position = entity.target

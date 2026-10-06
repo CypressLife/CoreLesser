@@ -1,12 +1,6 @@
 package com.github.corelesser.core
 
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.sin
-import kotlin.math.pow
-import kotlin.math.cos
-import kotlin.math.tan
-import kotlin.math.sqrt
+import kotlin.math.*
 
 private const val PI1 = PI.toFloat()
 private const val PI2 = (2 * PI).toFloat()
@@ -29,6 +23,7 @@ value class Radius private constructor(val value: Float) {
     operator fun times(other: Float) = create(this.value * other)
     operator fun div(other: Float) = create(this.value / other)
     operator fun rem(other: Float) = create(this.value % other)
+    operator fun unaryPlus() = create(value)
     operator fun unaryMinus() = create(-value)
     // 比较
     operator fun compareTo(other: Radius) = this.value.compareTo(other.value)

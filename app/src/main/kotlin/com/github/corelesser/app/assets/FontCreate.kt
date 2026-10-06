@@ -11,6 +11,7 @@ import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.VisTextButton.VisTextButtonStyle
+import sun.font.TextLabel
 
 // 字符构造器
 object FontCreate {
@@ -44,6 +45,16 @@ object FontCreate {
     }
 
     // UI 字体文本设置
+    fun Label.text(text: String, language: Language, size: Int): Label {
+        val font = when (language) {
+            Language.Simple_Chinese -> chinese_font
+            else -> {chinese_font}
+        }
+        style = Label.LabelStyle(font, Color.WHITE)
+        setText(text)
+        setFontScale(size.toFloat() / BASE_SIZE)
+        return this
+    }
     fun VisLabel.text(text: String, language: Language, size: Int): VisLabel {
         val font = when (language) {
             Language.Simple_Chinese -> chinese_font
@@ -55,12 +66,14 @@ object FontCreate {
         return this
     }
     fun VisTextButton.text(text: String, language: Language, size: Int = 1): VisTextButton {
-        style = VisTextButtonStyle(VisUI.getSkin().get(VisTextButtonStyle::class.java)).apply {
-            when(language) {
-                Language.Simple_Chinese -> font = chinese_font
-                else -> {chinese_font}
-            }
+        val font = when(language) {
+            Language.Simple_Chinese -> chinese_font
+            else -> {chinese_font}
         }
+        style = VisTextButtonStyle(VisUI.getSkin().get(VisTextButtonStyle::class.java)).apply {
+            this.font = font
+        }
+        label.style = Label.LabelStyle(font, Color.WHITE)
         label.setText(text)
         label.setFontScale(size.toFloat() / BASE_SIZE)
         return this

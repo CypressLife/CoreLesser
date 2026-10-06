@@ -2,14 +2,14 @@ package com.github.corelesser.app
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Colors
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -19,28 +19,31 @@ import com.github.corelesser.app.lang.Language
 import com.github.corelesser.core.Radius
 import com.github.corelesser.core.Vector2D
 import com.github.corelesser.core.entity.Buildings
-import com.github.corelesser.core.entity.Carrier
-import com.github.corelesser.core.entity.EntityFactory
-import com.github.corelesser.core.entity.ables.CarrierMove
-import com.github.corelesser.core.entity.ables.StoreHelper
-import com.github.corelesser.core.entity.ables.Storeable
-import com.github.corelesser.core.entity.manager.EntityManager
+import com.github.corelesser.core.entity.TestCarrier
+import com.github.corelesser.core.entity.TestCarrierCenter
+import com.github.corelesser.core.entity.TestFactory
+import com.github.corelesser.core.entity.ables.buildings.CarrierCenterHelper
+import com.github.corelesser.core.entity.ables.buildings.FactoryController
+import com.github.corelesser.core.entity.ables.buildings.P2Pchannel
+import com.github.corelesser.core.entity.ables.buildings.Recipe
+import com.github.corelesser.core.entity.ables.buildings.Storeable
+import com.github.corelesser.core.entity.ables.units.CarrierController
+import com.github.corelesser.core.entity.ables.units.CarrierHelper
+import com.github.corelesser.core.entity.ables.units.UnitEntityMove
 import com.github.corelesser.core.materials.Iron
-import com.github.corelesser.core.materials.Item
+import com.github.corelesser.core.materials.Steel
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.VisWindow
+import ktx.actors.alpha
 import ktx.app.KtxApplicationAdapter
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.async.KtxAsync
-import org.jetbrains.kotlin.gradle.internal.util.UnitStats
-import kotlin.collections.set
+import ktx.scene2d.actors
 import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.pow
 
 // 游戏入口
 class CoreLesser : KtxApplicationAdapter {
@@ -82,8 +85,8 @@ class CoreLesser : KtxApplicationAdapter {
     }
 
     // 逻辑更新
-    fun update() {
-        screen?.update()
+    fun update(tick: Float) {
+        screen?.update(tick)
     }
 
     // 渲染更新
@@ -92,7 +95,7 @@ class CoreLesser : KtxApplicationAdapter {
         times += delta_time
         while (times > 0.025f) {
             times -= 0.025f
-            update()
+            update(delta_time)
         }
         screen?.render(delta_time)
     }
@@ -119,7 +122,7 @@ abstract class CoreLesserScreen(private val game: CoreLesser): KtxScreen {
         get() = game.window_width
     val window_height
         get() = game.window_height
-    abstract fun update()
+    abstract fun update(tick: Float)
 }
 // 游戏菜单屏幕
 class MainScreen(private val game: CoreLesser): CoreLesserScreen(game) {
@@ -131,7 +134,8 @@ class MainScreen(private val game: CoreLesser): CoreLesserScreen(game) {
         text(language.text.battle, language, 24)
         addListener(object: ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                screen = GameScreen(game)
+                // screen = GameScreen(game)
+                screen = UITestScreen(game)
             }
         })
     }
@@ -187,7 +191,7 @@ class MainScreen(private val game: CoreLesser): CoreLesserScreen(game) {
         button_table.pack()
         button_table.setPosition((window_width - button_table.width) / 2f, (window_height - button_table.height) / 2f)
     }
-    override fun update() {}
+    override fun update(tick: Float) {}
     override fun render(delta: Float) {
         clearScreen(0.8f, 0.8f, 0.8f, 1.0f)
         camera.update()
@@ -202,105 +206,187 @@ class MainScreen(private val game: CoreLesser): CoreLesserScreen(game) {
 // 游戏界面屏幕
 class GameScreen(private val game: CoreLesser) : CoreLesserScreen(game) {
     // 相机和视口
-    val world_camera = OrthographicCamera()
+    val world_camera = OrthographicCamera().apply {
+        zoom = 2f
+    }
     val world_viewport = ExtendViewport(1280f, 720f, world_camera)
     val control_camera = OrthographicCamera()
     val control_viewport = ScreenViewport(control_camera)
 
     // 屏幕控件
-    val stage = Stage(control_viewport)
+    val info_text = VisLabel("").apply {
+        setPosition(20f, 320f)
+    }
+    val building_3_info_button = VisTextButton("").apply {
+        setPosition(96f, 512f)
+        setSize(96f, 96f)
+        addListener(object: ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                control_stage.addActor(building_3_info_window)
+                Gdx.input.inputProcessor = control_stage
+            }
+        })
+    }
+    val building_3_info = VisLabel("")
+    val building_3_info_window = VisWindow("").apply {
+        setSize(256f, 128f)
+        addActor(building_3_info)
+    }
+    val world_stage = Stage(world_viewport).apply {
+        addActor(building_3_info_button)
+    }
+    val control_stage = Stage(control_viewport).apply {
+        addActor(info_text)
+    }
     // 屏幕布局
 
     // 测试代码
-    val building1 = Buildings.create_store(
+    val building1 = TestFactory(
         0L,
         Vector2D.pair(48f, 48f),
         Radius.create(0f),
         item_capacity = 100L,
-        texture = Texture("Factory.png"),
-    ).apply { item_store_list[Iron] = 100L }
-    val building2 = Buildings.create_store(
-        1L,
-        Vector2D.pair(960f, 480f),
-        Radius.create(0f),
-        item_capacity = 100L,
+        recipe = Recipe(1f, mapOf(), mapOf(Iron to 2L)),
         texture = Texture("Factory.png"),
     )
-    val carrier = Carrier(
+    val building2 = Buildings.create_store(
+        1L,
+        Vector2D.pair(640f, 480f),
+        Radius.create(0f),
+        item_capacity = 50L,
+        texture = Texture("Factory.png"),
+    ).apply {
+        item_store_list[Iron] = 3
+    }
+    val building3 = Buildings.create_store(
+        6L,
+        Vector2D.pair(96f, 512f),
+        Radius.create(0f),
+        item_capacity = 50L,
+        texture = Texture("Factory.png"),
+    )
+    val test_factory = TestFactory(
+        4L,
+        Vector2D.pair(690f, 360f),
+        Radius.create(0f),
+        item_capacity = 10L,
+        recipe = Recipe(0.5f, mapOf(Iron to 1L), mapOf(Steel to 1L)),
+        texture = Texture("Factory.png"),
+    ).apply {
+        item_store_list[Iron] = 10L
+    }
+    val test_channel_1 = P2Pchannel(building1 as Storeable, test_factory, Iron , false)
+    val test_channel_2 = P2Pchannel(building1, building3, Steel, true)
+    val test_carrier_1 = TestCarrier(
         2L,
         Vector2D.pair(690f, 360f),
         Radius.create(0f),
         acceleration = 1f,
         deceleration = 2.5f,
-        rotate = Radius.create(PI.toFloat() / 32f),
-        speed = 0f,
+        rotate = Radius.create(PI.toFloat() / 16f),
         speed_max = 10f,
-        target = Vector2D.pair(48f, 48f),
-        item_capacity = 10L,
-        texture = Texture("TestRunner.png")
+        target = building1.position,
+        item_capacity = 1L,
+        channel = test_channel_1,
+        texture = Texture("TestRunner.png"),
     )
-    val direction
-        get() = carrier.target - carrier.position
-    val rotate
-        get() = atan2(direction.y, direction.x)
-    val distance
-        get() = (carrier.target - carrier.position).length()
-    val entity_manager = EntityManager().apply {
-        add_entity(building1)
-        add_entity(building2)
-        add_entity(carrier)
+    val test_carrier_2 = TestCarrier(
+        3L,
+        Vector2D.pair(20f, 600f),
+        Radius.create(0f),
+        acceleration = 1f,
+        deceleration = 2.5f,
+        rotate = Radius.create(PI.toFloat() / 16f),
+        speed_max = 10f,
+        target = building1.position,
+        item_capacity = 1L,
+        channel = test_channel_1,
+        texture = Texture("TestRunner.png"),
+    )
+    val test_carrier_3 = TestCarrier(
+        7L,
+        Vector2D.pair(0f, 0f),
+        Radius.create(0f),
+        acceleration = 2f,
+        deceleration = 5f,
+        rotate = Radius.create(PI.toFloat() / 4f),
+        speed_max = 30f,
+        target = test_factory.position,
+        item_capacity = 10L,
+        channel = test_channel_2,
+        texture = Texture("TestRunner.png"),
+    ).apply {
+        sprite.scale(2f)
     }
-    val store_helper = StoreHelper(entity_manager)
-    val carrier_move = CarrierMove()
+    val test_center = TestCarrierCenter(
+        id = 5L,
+        Vector2D.pair(690f, 360f),
+        Radius.create(0f),
+    ).apply {
+        carriers[2L] = test_carrier_1
+        carriers[3L] = test_carrier_2
+        carriers[7L] = test_carrier_3
+        channels.add(test_channel_1)
+        channels.add(test_channel_2)
+    }
+    val carrier_helper = CarrierHelper()
+    val carrier_controller = CarrierController()
+    val move_helper = UnitEntityMove()
+    val factory_helper = FactoryController()
+    val center_helper = CarrierCenterHelper()
 
-    override fun update() {
-        carrier_move.entity_move(carrier)
-        println("速度：${carrier.speed}，方向：${carrier.rotation}")
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            val mouse_position = world_camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
-            carrier.target = Vector2D.pair(mouse_position.x, mouse_position.y)
-        }
-        /*
-        building2.item_store_list[Iron]?.let {
-            if (it == building2.item_capacity)
-                return
-        }
-        if (carrier.arrive && carrier.target == building1.position) {
-            building1.item_store_list[Iron] = store_helper.accept_item(carrier, Iron, 20L)
-            carrier.target (building2.position)
-        } else if (carrier.arrive && carrier.target == building2.position) {
-            carrier.item_store_list[Iron] = store_helper.accept_item(building2, Iron, 20L)
-            carrier.target (building1.position)
-        }
-        carrier.move()*/
+    override fun update(tick: Float) {
+        factory_helper.update(listOf(building1, test_factory), tick)
+        center_helper.update(
+            listOf(test_center),
+            carrier_controller,
+            carrier_helper,
+            move_helper,
+            tick
+        )
     }
 
     override fun render(delta: Float) {
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            Gdx.app.postRunnable {
+                building_3_info_window.remove()
+                Gdx.input.inputProcessor = world_stage
+            }
+        }
         clearScreen(0.2f, 0.2f, 0.2f, 1f)
         // 游戏画面渲染
         world_camera.update()
-        world_viewport.update(game.window_width, game.window_height, true)
         world_viewport.apply()
         batch_2d.projectionMatrix = world_camera.combined
         batch_2d.begin()
-        building1.sprite.draw(batch_2d)
+        // building1.sprite.draw(batch_2d)
         building2.sprite.draw(batch_2d)
-        carrier.sprite.draw(batch_2d)
+        test_carrier_1.sprite.draw(batch_2d)
+        test_carrier_2.sprite.draw(batch_2d)
+        test_carrier_3.sprite.draw(batch_2d)
         batch_2d.end()
         // 游戏 UI 渲染
         control_camera.update()
         control_viewport.update(window_width, window_height, true)
         control_viewport.apply()
+        info_text.text("B1仓储：${building1.item_store_list}" +
+                "\n无人机3背包：${test_carrier_3.now_item_type} 数量：${test_carrier_3.now_item_value} / ${test_carrier_3.item_capacity}" +
+                "\n工厂仓储：${test_factory.item_store_list}" +
+                "\nB3仓库仓储：${building3.item_store_list}", language, 24)
+        world_stage.act(delta)
+        world_stage.draw()
+        control_stage.act(delta)
+        control_stage.draw()
     }
     override fun show() {
-        Gdx.input.inputProcessor = stage
-        carrier.target = building1.position
+        Gdx.input.inputProcessor = world_stage
+        test_carrier_1.target = building1.position
     }
     override fun resize(width: Int, height: Int) {
         world_viewport.update(width, height, true)
         control_viewport.update(width, height, true)
     }
     override fun dispose() {
-        stage.dispose()
+        control_stage.dispose()
     }
 }

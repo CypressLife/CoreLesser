@@ -27,6 +27,8 @@ import com.kotcrab.vis.ui.widget.VisWindow
 import ktx.actors.alpha
 import ktx.app.clearScreen
 import org.w3c.dom.Text
+import kotlin.math.abs
+import kotlin.math.pow
 
 class UITestScreen(private val game: CoreLesser): CoreLesserScreen(game) {
     // 事件监听器
@@ -78,7 +80,7 @@ class UITestScreen(private val game: CoreLesser): CoreLesserScreen(game) {
     val input_adapter = object : InputAdapter() {
         override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             val world_position = world_viewport.unproject(Vector2(screenX.toFloat(), screenY.toFloat()))
-            if (world_position.x - building1.position.x <= building1.sprite.width) {
+            if (building1.sprite.boundingRectangle.contains(world_position.x, world_position.y)) {
                 control_stage.addActor(building1_info_window)
             }
             return true

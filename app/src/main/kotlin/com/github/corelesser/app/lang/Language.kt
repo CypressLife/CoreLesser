@@ -4,8 +4,8 @@ abstract class LanguageText {
     abstract val title: String
     abstract val battle: String
     abstract val option: String
-    abstract val copper: String
     abstract val iron: String
+    abstract val steel: String
     abstract val gold: String
 }
 

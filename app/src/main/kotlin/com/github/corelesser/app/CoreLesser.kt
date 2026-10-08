@@ -8,8 +8,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -22,11 +20,7 @@ import com.github.corelesser.core.entity.Buildings
 import com.github.corelesser.core.entity.TestCarrier
 import com.github.corelesser.core.entity.TestCarrierCenter
 import com.github.corelesser.core.entity.TestFactory
-import com.github.corelesser.core.entity.ables.buildings.CarrierCenterHelper
-import com.github.corelesser.core.entity.ables.buildings.FactoryController
-import com.github.corelesser.core.entity.ables.buildings.P2Pchannel
-import com.github.corelesser.core.entity.ables.buildings.Recipe
-import com.github.corelesser.core.entity.ables.buildings.Storeable
+import com.github.corelesser.core.entity.ables.buildings.*
 import com.github.corelesser.core.entity.ables.units.CarrierController
 import com.github.corelesser.core.entity.ables.units.CarrierHelper
 import com.github.corelesser.core.entity.ables.units.UnitEntityMove
@@ -37,12 +31,10 @@ import com.kotcrab.vis.ui.widget.VisLabel
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisTextButton
 import com.kotcrab.vis.ui.widget.VisWindow
-import ktx.actors.alpha
 import ktx.app.KtxApplicationAdapter
 import ktx.app.KtxScreen
 import ktx.app.clearScreen
 import ktx.async.KtxAsync
-import ktx.scene2d.actors
 import kotlin.math.PI
 
 // 游戏入口

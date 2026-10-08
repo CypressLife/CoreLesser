@@ -1,10 +1,9 @@
 root = true
-[*.{kt,kts}]
-# 禁用属性命名检查 (对应变量)
-ij_kotlin_ignore_property_name = true
 
-# 禁用函数命名检查 (对应函数)
-ij_kotlin_ignore_function_name = true
-
-# 禁用局部变量命名检查
-ij_kotlin_ignore_local_variable_name = true
+[*.kt]
+# 禁用函数命名检查（如果你希望函数也能用下划线）
+ktlint_standard_function-naming = disabled
+# 禁用属性命名检查（允许变量、属性使用下划线）
+ktlint_standard_property-naming = disabled
+# 禁用类命名检查（如果你希望类名也能用下划线）
+ktlint_standard_class-naming = disabled

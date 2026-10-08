@@ -11,6 +11,16 @@ interface Factoriable: Storeable {
     override fun can_extract(item: Item): Boolean {
         return recipe.item_output[item] != null
     }
+    override fun item_list_print(): String {
+        var text = ""
+        for (item in recipe.item_input.keys) {
+            text += "${item.display_name}: ${item_store_list[item] ?: 0L} / $item_capacity\n"
+        }
+        for (item in recipe.item_output.keys) {
+            text += "${item.display_name}: ${item_store_list[item] ?: 0L} / $item_capacity\n"
+        }
+        return text
+    }
 }
 
 // 工厂能力状态处理

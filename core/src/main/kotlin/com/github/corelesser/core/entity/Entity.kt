@@ -6,5 +6,7 @@ import com.github.corelesser.core.Vector2D
 abstract class Entity(
     val id: Long,
     var position: Vector2D,
-    var rotation: Radius
-)
+    var rotation: Radius,
+) {
+    abstract val display_name: String?
+}

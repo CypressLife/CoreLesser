@@ -5,11 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.github.corelesser.core.Radius
 import com.github.corelesser.core.Vector2D
 import com.github.corelesser.core.entity.ables.SpriteDrawable
-import com.github.corelesser.core.entity.ables.buildings.CarrierCenterable
-import com.github.corelesser.core.entity.ables.buildings.Factoriable
-import com.github.corelesser.core.entity.ables.buildings.P2Pchannel
-import com.github.corelesser.core.entity.ables.buildings.Recipe
-import com.github.corelesser.core.entity.ables.buildings.Storeable
+import com.github.corelesser.core.entity.ables.buildings.*
 import com.github.corelesser.core.entity.ables.units.Carrierable
 import com.github.corelesser.core.materials.Item
 import kotlin.math.PI
@@ -46,6 +42,7 @@ class TestStore(
     override val item_capacity: Long,
     override val texture: Texture,
 ): BuildingEntity(id, position, rotation), Storeable, SpriteDrawable {
+    override val display_name: String? = "测试仓库"
     override val sprite = Sprite(texture)
         get() {
             field.setPosition(position.x - field.width / 2f, position.y - field.height / 2f)
@@ -60,6 +57,7 @@ class TestCarrierCenter(
     position: Vector2D,
     rotation: Radius,
 ): BuildingEntity(id, position, rotation), CarrierCenterable {
+    override val display_name: String? = "测试中枢"
     override val carriers = mutableMapOf<Long, Carrierable>()
     override val channels = mutableListOf<P2Pchannel>()
     override fun update(tick: Float) {
@@ -74,6 +72,7 @@ class TestFactory(
     override val recipe: Recipe,
     override val texture: Texture,
 ): BuildingEntity(id, position, rotation), Factoriable, SpriteDrawable {
+    override val display_name: String? = "测试工厂"
     override val sprite = Sprite(texture)
         get() {
             field.setPosition(position.x - field.width / 2f, position.y - field.height / 2f)

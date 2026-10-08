@@ -5,7 +5,6 @@ import com.github.corelesser.core.entity.UnitEntity
 import com.github.corelesser.core.entity.ables.buildings.Factoriable
 import com.github.corelesser.core.entity.ables.buildings.P2Pchannel
 import com.github.corelesser.core.entity.ables.buildings.Storeable
-import com.github.corelesser.core.materials.Iron
 import com.github.corelesser.core.materials.Item
 
 // 单位实体运输能力接口
